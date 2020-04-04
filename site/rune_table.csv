@@ -1,8 +1,9 @@
 pattern,  rep_mid
-(Th), \u16a6
-(th), \u16d1
-(ae), \u16c5
-(oo), \u16af
+\(Th\), \u16a6
+\(th\), \u16a7
+\(ae\), \u16c5
+\(AE\), \u16c5
+\(oo\), \u16af
 [aA], \u16c6
 [bB], \u16d2
 [cC], \u16cd
@@ -20,9 +21,10 @@ pattern,  rep_mid
 [pP], \u16d4
 [qQ], \u16b4
 [rR], \u16b1
-[sS], \u16c8
+[sS], \u16cb
 [tT], \u16d0
 [uU], \u16a2
 [vV], \u16a1
 [yY], \u16e6
 [zZ], \u16ce
+[ ],  \u16ec

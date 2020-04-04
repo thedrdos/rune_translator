@@ -1,30 +1,139 @@
 <!DOCTYPE html>
 <html>
-<body>
+<head>
+<title>Text to Runes Converter</title>
+</head>
+<style type="text/css">
+textarea {
+   font-size: 14pt;
+}
+#table {
+  font-size: 10pt;
+}
+</style>
+<body onload="converttext()">
+<h1>Text to Runes Converter</h1>
 
-Select your favorite fruit:
+<!-- Will maybe later implement a table with more columns and then select here which rune alphabet to use -->
+<!--
+<p>
+Not yet implemented
 <select id="mySelect">
-  <option>Apple</option>
-  <option>Orange</option>
-  <option>Pineapple</option>
-  <option>Banana</option>
+  <option>This should later be to select different sets of runes</option>
+  <option>PlaceHolder</option>
 </select>
+<button type="button" onclick="myFunction()">Select</button>
+</p>
+-->
+<!-- Main input text area-->
+<textarea type="text" id="inputtext" onchange="myFunction2()" rows="4" cols="30">
+Some text to convert into runes
+Examples of special characters:
+(Th)(th)(ae)(oo)
+</textarea>
+<br>
+<button onclick="converttext()">Convert</button>
+<br>
+<!-- Main output text area-->
+<textarea type="text" id="convertedtext" rows="4" cols="30"></textarea>
 
-<p>Click the button to display the text of all options in the dropdown list.</p>
-
-<button type="button" onclick="myFunction()">Try it</button>
-
-<h3>A demonstration of how to access a Text Field</h3>
-
-<input type="text" id="myText" value="Some text...">
-
-<p>Click the "Try it" button to get the text in the text field.</p>
-
-<button onclick="myFunction2()">Try it</button>
-
-<p id="demo"></p>
+<br>
+<hr>
+<!-- Supplimental stuff -->
+<p>
+The rune conversion table (may add more later)
+</p>
+<textarea type="text" id="table" rows="34" cols="30" readonly></textarea>
+<p>
+References:
+<br>
+<a href="https://is.wikipedia.org/wiki/R%C3%BAnir">Runes on the Icelandic Wikipedia.</a>
+<br>
+<a href="https://en.wikipedia.org/wiki/Runes">Runes on the English wikipedia.</a>
+<br>
+<a href="https://www.unicode.org/charts/PDF/U16A0.pdf">Official Unicode Consortium code chart on Runes.</a>
+</p>
 
 <script>
+// Hack shitty way of importing my table
+// because I didn't finish figuring out how to import the .csv file
+// If I can at least read it in as text, then it should look like this string:
+var rune_table = "\
+pattern,  rep_mid\n\
+\\(Th\\), \u16a6\n\
+\\(th\\), \u16a7\n\
+\\(ae\\), \u16c5\n\
+\\(AE\\), \u16c5\n\
+\\(oo\\), \u16af\n\
+[aA], \u16c6\n\
+[bB], \u16d2\n\
+[cC], \u16cd\n\
+[dD], \u16d1\n\
+[eE], \u16c2\n\
+[fF], \u16a0\n\
+[gG], \u16b5\n\
+[hH], \u16bc\n\
+[iI], \u16c1\n\
+[kK], \u16b4\n\
+[lL], \u16da\n\
+[mM], \u16d8\n\
+[nN], \u16bf\n\
+[oO], \u16ae\n\
+[pP], \u16d4\n\
+[qQ], \u16b4\n\
+[rR], \u16b1\n\
+[sS], \u16cb\n\
+[tT], \u16d0\n\
+[uU], \u16a2\n\
+[vV], \u16a1\n\
+[yY], \u16e6\n\
+[zZ], \u16ce\n\
+[ ],  \u16ec\n\
+";
+
+// Convert the table text into string array
+var rune_table_array = rune_table.split("\n").map(function(line){
+  return line.split(",");
+}); // simple parsing, first cut up into line then map to execute a split by , on each line
+// Remove leading/trailing whitespace from all the entries
+rune_table_array = rune_table_array.map(function(val,ind){
+  return val.map(function(val2,ind2){
+    return val2.trim();
+  });
+})
+
+// Run the pattern to replace all occurances of each with the corresponding unicode rune
+function rune_rep(org){
+    var out = org; // initialize the output string
+    var patterns = rune_table_array.map(function(val,ind){
+      return val[0];
+    }); // get the first column
+    patterns = patterns.slice(1,-1); // remove the header
+
+    var reps = rune_table_array.map(function(val,ind){
+      return val[1];
+    }); // get the first column
+    reps = reps.slice(1,-1); // remove the header
+
+    for (index = 0; index < patterns.length; index++) {
+        if (reps[index].length>0){
+          patt = new RegExp(patterns[index],'g'); // create a regular expression from the pattern
+          out = out.replace(patt,reps[index]);
+        };
+    }
+    return out;
+}
+
+// Get the text, report the conversion, populate the table textarea
+function converttext() {
+  var x = document.getElementById("inputtext").value;
+  document.getElementById("convertedtext").innerHTML = rune_rep(x);
+
+  document.getElementById("table").style.tabSize = "16"
+  document.getElementById("table").innerHTML = rune_table.replace(/,/g,'\t');
+}
+
+// Dummy
 function myFunction() {
   var x = document.getElementById("mySelect");
   var txt = "All options: ";
@@ -34,10 +143,6 @@ function myFunction() {
   }
 
 alert(txt);
-}
-function myFunction2() {
-  var x = document.getElementById("myText").value;
-  document.getElementById("demo").innerHTML = x+"\u16A0";
 }
 </script>
 

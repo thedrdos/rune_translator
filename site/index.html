@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+Select your favorite fruit:
+<select id="mySelect">
+  <option>Apple</option>
+  <option>Orange</option>
+  <option>Pineapple</option>
+  <option>Banana</option>
+</select>
+
+<p>Click the button to display the text of all options in the dropdown list.</p>
+
+<button type="button" onclick="myFunction()">Try it</button>
+
+<h3>A demonstration of how to access a Text Field</h3>
+
+<input type="text" id="myText" value="Some text...">
+
+<p>Click the "Try it" button to get the text in the text field.</p>
+
+<button onclick="myFunction2()">Try it</button>
+
+<p id="demo"></p>
+
+<script>
+function myFunction() {
+  var x = document.getElementById("mySelect");
+  var txt = "All options: ";
+  var i;
+  for (i = 0; i < x.length; i++) {
+    txt = txt + "\n" + x.options[i].text;
+  }
+
+alert(txt);
+}
+function myFunction2() {
+  var x = document.getElementById("myText").value;
+  document.getElementById("demo").innerHTML = x+"\u16A0";
+}
+</script>
+
+</body>
+</html>

@@ -26,17 +26,18 @@ Not yet implemented
 </p>
 -->
 <!-- Main input text area-->
-<textarea type="text" id="inputtext" onchange="myFunction2()" rows="6" cols="40">
+<textarea type="text" id="inputtext" rows="6" cols="40">
 Some text to convert into runes
 You can enter your own.
 Examples of special characters:
 (Th)(th)(ae)(oo)
 </textarea>
 <br>
-<button onclick="converttext()">Convert</button>
+<button onclick="converttext()">Convert &#x2193;</button>
+<button onclick="convertrunes()">Reverse &#x2191;</button>
 <br>
 <!-- Main output text area-->
-<textarea type="text" id="convertedtext" rows="6" cols="40"></textarea>
+<textarea type="text" id="runetext" rows="6" cols="40"></textarea>
 
 <br>
 <hr>
@@ -59,37 +60,40 @@ References:
 // Hack shitty way of importing my table
 // because I didn't finish figuring out how to import the .csv file
 // If I can at least read it in as text, then it should look like this string:
+// Third column added for reverse replacement,
+// default if empty is to use the second letter of the pattern
 var rune_table = "\
-pattern,  rep_mid\n\
-\\(Th\\), \u16a6\n\
-\\(th\\), \u16a7\n\
-\\(ae\\), \u16c5\n\
-\\(AE\\), \u16c5\n\
-\\(oo\\), \u16af\n\
-[aA], \u16c6\n\
-[bB], \u16d2\n\
-[cC], \u16cd\n\
-[dD], \u16d1\n\
-[eE], \u16c2\n\
-[fF], \u16a0\n\
-[gG], \u16b5\n\
-[hH], \u16bc\n\
-[iI], \u16c1\n\
-[kK], \u16b4\n\
-[lL], \u16da\n\
-[mM], \u16d8\n\
-[nN], \u16bf\n\
-[oO], \u16ae\n\
-[pP], \u16d4\n\
-[qQ], \u16b4\n\
-[rR], \u16b1\n\
-[sS], \u16cb\n\
-[tT], \u16d0\n\
-[uU], \u16a2\n\
-[vV], \u16a1\n\
-[yY], \u16e6\n\
-[zZ], \u16ce\n\
-[ ],  \u16ec\n\
+pattern,  rep_mid,  rev_mid \n\
+\\(Th\\), \u16a6,  (Th) \n\
+\\(th\\), \u16a7,  (th) \n\
+\\(ae\\), \u16c5,  (ae) \n\
+\\(AE\\), \u16c5,  (AE) \n\
+\\(OO\\), \u16af,  (oo) \n\
+\\(oo\\), \u16af,  (oo) \n\
+[aA], \u16c6,  \n\
+[bB], \u16d2,  \n\
+[cC], \u16cd,  \n\
+[dD], \u16d1,  \n\
+[eE], \u16c2,  \n\
+[fF], \u16a0,  \n\
+[gG], \u16b5,  \n\
+[hH], \u16bc,  \n\
+[iI], \u16c1,  \n\
+[kK], \u16b4,  \n\
+[lL], \u16da,  \n\
+[mM], \u16d8,  \n\
+[nN], \u16bf,  \n\
+[oO], \u16ae,  \n\
+[pP], \u16d4,  \n\
+[qQ], \u16b4,  \n\
+[rR], \u16b1,  \n\
+[sS], \u16cb,  \n\
+[tT], \u16d0,  \n\
+[uU], \u16a2,  \n\
+[vV], \u16a1,  \n\
+[yY], \u16e6,  \n\
+[zZ], \u16ce,  \n\
+[ ],  \u16ec,  \n\
 ";
 
 // Convert the table text into string array
@@ -125,10 +129,53 @@ function rune_rep(org){
     return out;
 }
 
+// Convert back from the runes
+function rune_rev(org){
+    var out = org; // initialize the output string
+    var patterns = rune_table_array.map(function(val,ind){
+      return val[0];
+    }); // get the first column
+    patterns = patterns.slice(1,-1); // remove the header
+
+    var runes = rune_table_array.map(function(val,ind){
+      return val[1];
+    }); // get the first column
+    runes = runes.slice(1,-1); // remove the header
+
+    var revs = rune_table_array.map(function(val,ind){
+      return val[2];
+    }); // get the first column
+    revs = revs.slice(1,-1); // remove the header
+
+    for (index = 0; index < patterns.length; index++) {
+        if (runes[index].length>0){
+          patt = new RegExp(runes[index],'g'); // create a regular expression from the pattern
+          if (revs[index].length>0){
+            out = out.replace(patt,revs[index]);
+          }
+          else{
+            // If there isn't an explicit reverse entry, then use second letter in the pattern
+            out = out.replace(patt,patterns[index][1]);
+          }
+        };
+    }
+    return out;
+}
+
 // Get the text, report the conversion, populate the table textarea
 function converttext() {
   var x = document.getElementById("inputtext").value;
-  document.getElementById("convertedtext").innerHTML = rune_rep(x);
+  document.getElementById("runetext").innerHTML = rune_rep(x);
+  document.getElementById("runetext").value = rune_rep(x);
+
+  document.getElementById("table").style.tabSize = "16"
+  document.getElementById("table").innerHTML = rune_table.replace(/,/g,'\t');
+}
+
+function convertrunes() {
+  var x = document.getElementById("runetext").value;
+  document.getElementById("inputtext").innerHTML = rune_rev(x);
+  document.getElementById('inputtext').value= rune_rev(x);
 
   document.getElementById("table").style.tabSize = "16"
   document.getElementById("table").innerHTML = rune_table.replace(/,/g,'\t');
